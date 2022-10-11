@@ -1,40 +1,56 @@
 from distutils import errors
 from rest_framework.response import Response
-from inmuebleslist_app.models import Inmueble
-from inmuebleslist_app.api.serializers import InmuebleSerializer
+from inmuebleslist_app.models import Edificacion, Empresa
+from inmuebleslist_app.api.serializers import EdificacionSerializer ,EmpresaSerializer
 #from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.views import APIView
 
-class InmuebleListAV(APIView):
+
+class EmpresaAV(APIView):
+    def get(self,request):
+        empresas = Empresa.objects.all()
+        serializer = EmpresaSerializer(empresas,many=True)
+        return Response (serializer.data)
+    
+    def post(self,request):
+        serializer = EmpresaSerializer(data = request.data)
+        if serializer.is_valid():
+            serializer.save
+            return Response(serializer.data)
+        else: Response(serializer.errors , status=errors.HTTP_400_BAD_REQUEST)
+    
+
+
+class EdificacionListAV(APIView):
     def get(self, request):
-        inmuebles = Inmueble.objects.all()
-        serializer = InmuebleSerializer(inmuebles,many=True)
+        inmuebles = Edificacion.objects.all()
+        serializer = EdificacionSerializer(inmuebles,many=True)
         return Response(serializer.data)
     
     def post(self, request):
-        serializer= InmuebleSerializer(data =request.data)
+        serializer= EdificacionSerializer(data =request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         else:
             return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
         
-class InmuebleDetalleAV(APIView):
+class EdificacionDetalleAV(APIView):
     def get(self, request,pk):
         try: 
-            inmueble = Inmueble.objects.get(pk=pk)
-        except Inmueble.DoesNotExist:
-            return Response({'Error' : 'Inmueble no enocontrado'},status = status.HTTP_404_NOT_FOUND)
-        serializer = InmuebleSerializer(inmueble)
+            inmueble = Edificacion.objects.get(pk=pk)
+        except Edificacion.DoesNotExist:
+            return Response({'Error' : 'Inmueble no encontrado'},status = status.HTTP_404_NOT_FOUND)
+        serializer = EdificacionSerializer(inmueble)
         return Response(serializer.data)
     
     def put(self, request,pk):
         try: 
-            inmueble = Inmueble.objects.get(pk=pk)
-        except Inmueble.DoesNotExist:
-            return Response({'Error' : 'Inmueble no enocontrado'},status = status.HTTP_404_NOT_FOUND)
-        serializer = InmuebleSerializer(inmueble, data= request.data)
+            inmueble = Edificacion.objects.get(pk=pk)
+        except Edificacion.DoesNotExist:
+            return Response({'Error' : 'Inmueble no encontrado'},status = status.HTTP_404_NOT_FOUND)
+        serializer = EdificacionSerializer(inmueble, data= request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -42,8 +58,8 @@ class InmuebleDetalleAV(APIView):
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     def delete(self, request,pk):
         try: 
-            inmueble = Inmueble.objects.get(pk=pk)
-        except Inmueble.DoesNotExist:
+            inmueble = Edificacion.objects.get(pk=pk)
+        except Edificacion.DoesNotExist:
             return Response({'Correcto' : 'Se ha eliminado con exito'},status = status.HTTP_204_NO_CONTENT)
         
         inmueble.delete()
